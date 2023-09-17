@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        /* Add CSS for centering the search bar at the top-middle of the page */
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            height: 120vh;
+            margin: 0;
+            overflow: hidden; /* Prevent the whole page from scrolling */
+            background-image: url('https://images.pexels.com/photos/3255761/pexels-photo-3255761.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2'); /* Replace 'your-image.jpg' with the path to your image */
+            background-size: cover;
+            
+        }
+        header {
+            margin-bottom: 20px;
+            
+        }
+
+        h4 {
+            margin-bottom: 20px;
+            margin-top: 0px;
+        }
+
+        .search-bar {
+            position: relative;
+            padding: 50px;
+            display: flex;
+            width: 100%;
+            overflow: hidden;
+            background-color: rgba(128, 128, 128, 0.2);
+        }
+
+        .search-container{
+            padding: 0px;
+            border-radius: 19px;
+            align-items: center;
+            margin-left: 60px;
+        }
+
+        /* Add a pseudo-element for the background image with blur */
+        .search-bar::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Set the background image */
+            background-image: url('https://images.unsplash.com/photo-1492538368677-f6e0afe31dcc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Nnx8dW5pdmVyc2l0eXxlbnwwfHwwfHx8MA%3D%3D&auto=format&fit=crop&w=600&q=60');
+            /* Apply a slight blur effect to the background image */
+            filter: blur(2px); /* Adjust the blur amount as needed */
+            /* Set the background-size to cover to ensure the image covers the entire element */
+            background-size: cover;
+            
+            /* Adjust the z-index to place it behind the content */
+            z-index: -1;
+            background-color: rgba(128, 128, 128, 1.8); /* Adjust the rgba color and alpha (0.5) for the desired level of grey */
+
+        }
+        
+        .search-button {
+            border: none;
+            border-radius: 25px;
+            height: 40px;
+            background-color: #a0e1f6;
+            padding: 0 20px; /* Add padding to create space for the icon */
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s; /* Add a smooth hover effect on background color */
+        }
+
+        .search-button:hover {
+            background-color: #a0e1f6; /* Change the background color on hover */
+        }
+
+        .search-icon {
+            margin-right: 0px; /* Add spacing between the icon and text */
+        }
+
+
+        #autocomplete-search {
+            flex-grow: 1;
+            margin-right: 10px;
+            height: 45px; /* Adjust the search input height */
+            width: 800px;
+            text-align: center;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+            transition: background-color 0.3s ease-in-out, box-shadow 0.9s ease-in-out;
+            border-radius: 25px;
+        }
+
+        
+        .container {
+            display: flex;
+            /* Adjust spacing between info and review */
+            width: 1450px;
+            height: 72vh; /* Make both sections 3 times higher */
+            left: 50%;
+            top: 62%;
+            position: absolute;
+            transform: translate(-50%, -50%);
+        }
+
+        .university-info {
+            
+            background-color: #c2eef6; /* Add a background color for University Info */
+            padding: 20px;
+            padding-top: 7px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            /* Make University Info 49% of the container's width and add a little white space */
+            width: 40%; 
+            margin-right: 10px; /* Add a small margin */
+        }
+
+        .university-info:hover {
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.2); /* Slight shadow on hover */}
+        
+        
+        ul.horizontal-list {
+            padding: 0; /* Remove default padding */
+            display: flex; /* Use flexbox for horizontal layout */
+            margin-left: 10px;
+            margin-right: 20px;
+        }
+
+        /* Style for list items */
+        ul.horizontal-list li {
+            margin-right: 70px; /* Add spacing between items */
+            margin-top: -20px;
+            margin-bottom: -20px;
+        }
+         
+        .review-container {
+            
+            /* Add a background color for Reviews */
+            padding: 10px;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            /* Make Reviews 49% of the container's width and add a little white space */
+            width: 35%;
+            margin-left: 10px; /* Add a small margin */
+            overflow-y: auto; /* Make the review section scrollable */
+           
+            
+        }
+        .review-container:hover {
+            box-shadow: 0px 0px 30px rgba(0, 0, 0, 0.2); /* Slight shadow on hover */}
+
+        .review-title {
+            font-size: 24px; /* Increase the font size for the review title */
+            margin-bottom: 20px; /* Add some spacing below the title */
+            margin-top: 0px;
+            text-align: center;
+        }
+        .review-card {
+            margin-bottom: 20px; /* Add spacing between review cards */
+            background-color: #e5f7fb;
+            padding: 15px;
+            padding-top: 5px;
+            padding-bottom: 3px;
+            border-radius: 5px; /* Add rounded corners */
+            border: 1px solid #ccc; /* Add a border */
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+            flex: 1;
+        }
+
+        .review-card:hover {
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.12 ); /* Slight shadow on hover */
+            background-color: #d8f6fc;
+        }
+
+        .center-container {
+            display: flex;
+            justify-content: center; /* Center horizontally */
+            margin-top: 5px;
+            margin-bottom: 5px;
+            
+        }
+        /* this is for rating */
+
+        .rating-section {
+            text-align: center;
+            padding: 0px;
+        }
+
+        .criteria {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .criteria-item {
+            display: flex; /* Display items in a row */
+            justify-content: space-between; /* Space between items */
+            align-items: center; /* Center vertically */
+            width: 140px;
+            padding: 10px;
+            border: 1px solid #a6a5a5;
+            border-radius: 15px;
+            margin-bottom: 10px;
+        }
+
+        .criteria-item:hover {
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.12 ); /* Slight shadow on hover */
+            background-color: #3ebbd4;
+            font-weight: 550 ;
+            color: white;
+        }
+
+        .criteria-item p {
+            margin-bottom: 10px;
+        }
+
+        .rating {
+            display: flex;
+            align-items: center; /* Center vertically within the rating container */
+        }
+
+        .star {
+            font-size: 24px; /* Adjust the size of the star icon */
+            color: #ffc700; /* Star color (yellow) */
+        }
+
+        
+        .number-o-ratings {
+            margin-top: 0px;
+            font-size: 16px;
+        }
+        hr {
+            border-top: 1.5px dotted #5a5959;
+            width: 38%;
+            margin-top: 20px;
+            margin-bottom: 20px;
+           
+        }
+            
+                /* Style the scrollbar track (the background) */
+        ::-webkit-scrollbar {
+        width: 17px; /* Set the width of the scrollbar */
+        }
+
+        /* Style the scrollbar thumb (the draggable handle) */
+        ::-webkit-scrollbar-thumb {
+        background: rgb(207, 208, 209); /* Set the color of the scrollbar thumb */
+        border-radius: 6px; /* Round the edges of the scrollbar thumb */
+        }
+
+        /* Style the scrollbar track when the user hovers over it */
+        ::-webkit-scrollbar-track:hover {
+        background: lightblue; /* Set the color when hovered */
+        }
+
+        /* Style the scrollbar thumb when the user hovers over it */
+        ::-webkit-scrollbar-thumb:hover {
+        background: #000000; /* Set a different color when the thumb is hovered */
+        }
+
+        .gpt_container{
+            background-color:#333333;
+            overflow-y: auto; 
+            width: 25%;
+            margin-left: 20px;
+            padding: 10px;
+            border-radius: 15px; /* Rounded corners */  
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1); /* Soft box shadow */
+            transition: background-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        }
+
+        .gpt_container:hover {
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.12 ); /* Slight shadow on hover */
+            
+        }
+
+        .gptcard{
+            display: flex;
+            justify-content: center; /* Center horizontally */
+           
+        }
+        
+        .font{
+            font-size: 20px;
+        }
+        
+        .rating-value{
+            font-size: 20px;
+        }
+        
+    </style>
+    
+</head>
+
+<header>
+    <!-- Larger search bar -->
+    <div class="search-bar">
+        <a href="Intro.html"><p class="center-nah"><img src="rate-university-high-resolution-logo-color-on-transparent-background (1).png" alt="Logo" width="370" height="80"></p></a>
+        <div class="search-container">
+            <input type="text" id="autocomplete-search" placeholder="Search for a university here ...">
+            <div id="autocomplete-results" class="autocomplete-results"></div>
+        </div>
+        <button class = "search-button" id="search-button"><span class="search-icon">🔍</span> </button>
+    </div>
+</header>
+
+<body>       
+    <main id = "info-card">
+        <div  class="container">
+            <section class="university-info">
+                <!-- University information container -->
+                <h2 class="center-container" <span id = "school_name_y"></span></h2>
+                <p ><span id="accurate-address" style="font-weight: normal; margin-left: 15%; margin-bottom: 0px;">City, Country</span></p>
+                <p class="center-container"><img src = "" id = "image-source" alt="School Logo" height="60"></p>
+                <hr>
+                <h4 style = "margin-left: 33%;" class = "font"> Tuition (per year) </h4>
+                <ul class="horizontal-list">
+                    <li><p> Canadian Undergraduates: <span id="ca-student-undergraduate" class = "font"></span></p></li>
+                    <li><p> Canadian Graduates <span id="ca-student-graduate" class = "font"> </span></p></li>
+                </ul>
+                <ul class="horizontal-list">
+                    <li><p> International Undergraduates: <span id="international-student-undergraduate" class = "font"></span></p></li>
+                    <li><p> International Graduates: <span id="international-student-graduate" class = "font"></span></p></li>
+                </ul>
+                <hr>
+                <section class="rating-section">
+                    <h4 class = "font"> Overall Rate
+                        <span class="rating-value" id = "overall-quality" ></span>
+                        <span class="star">&#9733;</span>
+                    </h4>
+                    <div class="criteria">
+                        <div class="criteria-item">
+                            <p>Reputation</p>
+                            <div class="rating">
+                                <span class="rating-value" id = "reputation"></span>
+                                <span class="star">&#9733;</span>
+                            </div>
+                        </div>
+            
+                        <div class="criteria-item">
+                            <p>Facilities</p>
+                            <div class="rating">
+                                <span class="rating-value" id = "facilities"></span>
+                                <span class="star">&#9733;</span>
+                            </div>
+                        </div>
+            
+                        <div class="criteria-item">
+                            <p>Opportunities</p>
+                            <div class="rating">
+                                <span class="rating-value" id = "opportunities"></span>
+                                <span class="star">&#9733;</span>
+                            </div>
+                        </div>
+                        <!-- Repeat the criteria-item for each criterion -->
+                    </div>
+                </section>
+            
+                <section class="rating-section">
+                    <div class="criteria">
+                        <div class="criteria-item">
+                            <p>Clubs</p>
+                            <div class="rating">
+                                <span   class="rating-value" id = "clubs"></span>
+                                <span class="star">&#9733;</span>
+                            </div>
+                        </div>
+            
+                        <div class="criteria-item">
+                            <p>Safety</p>
+                            <div class="rating">
+                                <span  class="rating-value" id = "safety"></span>
+                                <span  class="star">&#9733;</span>
+                            </div>
+                        </div>
+            
+                        <div class="criteria-item">
+                            <p>Social</p>
+                            <div class="rating">
+                                <span  class="rating-value" id = "social"></span>
+                                <span class="star">&#9733;</span>
+                            </div>
+                        </div>
+                        <!-- Repeat the criteria-item for each criterion -->
+                    </div>
+                    <div class="number-o-ratings">
+                        <p>Number of Ratings: <span id ="number-of-ratings"></span></p>
+                    </div>
+                </section>
+            </section>
+
+            
+
+            <section class="review-container">
+                <!-- Review container with title -->
+                <h2 class="review-title">Reviews</h2>
+                <!-- Review card container with scrolling -->
+                <div class="review-card-container">
+                    <!-- Multiple review cards go here -->
+                    <!-- Add more review cards as needed -->
+                    <div id="reviews"></div>
+                    
+                </div>
+            </section>
+
+            <section class="gpt_container">
+                <!-- Review container with title -->
+                <div class="gptcard">
+                    <h2 style="color: #f2f2f2 ;">What ChatGPT says about these comments ?</h2>
+                    <br>
+                    <img src="pngwing.com.png" alt="ChatGPT Logo" height="60">
+                </div>
+                
+                <div id="chatgptoutput" class ="font" style="color: #f2f2f2 ;"></div>
+                <br>
+
+                
+                    
+                
+            </section>
+
+        </div>
+    </main>
+    
+    <!-- Include your JavaScript to handle interactions and dynamic content here -->
+    <script type = 'text/javascript'>
+        // Object to store university data
+        // Object to store university data
+        let universityData = {
+            "school_name_y":null,
+            "Number of Rating": null,
+            "Overall Quality": null,
+            "Reputation": null,
+            "Facilities": null,
+            "Opportunities": null,
+            "Clubs": null,
+            "Safety": null,
+            "Social": null,
+            "accurate_address": null,
+            "CA Student Undergraduate": null,
+            "CA Student Graduate": null,
+            "International Student Undergraduate": null,
+            "International Student Graduate": null,
+            "Image Source": null,
+        };
+
+        // Function to search for a university in the CSV file
+// Function to search for a university in the CSV file
+    function searchUniversity() {
+        // Get the user input
+        const userInput = document.getElementById("autocomplete-search").value;
+
+        // Fetch the CSV file (replace 'universities.csv' with the actual path to your CSV file)
+        fetch("OverallRate_Tuition.csv")
+            .then(response => response.text())
+            .then(data => {
+                Papa.parse(data, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function (parsedData) {
+                        const universities = parsedData.data;
+
+                        // Find the university with a matching school_name_y
+                        const university = universities.find(entry => entry.school_name_y.toLowerCase() === userInput.toLowerCase());
+
+                        if (university) {
+                            // Found a match, update the university data
+                            universityData["school_name_y"] = university["school_name_y"];
+                            universityData["Number of Rating"] = university["Number of Rating"];
+                            universityData["Overall Quality"] = university["Overall Quality"];
+                            universityData["Reputation"] = university["Reputation"];
+                            universityData["Facilities"] = university["Facilities"];
+                            universityData["Opportunities"] = university["Opportunities"];
+                            universityData["Clubs"] = university["Clubs"];
+                            universityData["Safety"] = university["Safety"];
+                            universityData["Social"] = university["Social"];
+                            universityData["accurate_address"] = university["accurate_address"];
+                            universityData["CA Student Undergraduate"] = university["CA Student Undergraduate"];
+                            universityData["CA Student Graduate"] = university["CA Student Graduate"];
+                            universityData["International Student Undergraduate"] = university["International Student Undergraduate"];
+                            universityData["International Student Graduate"] = university["International Student Graduate"];
+                            universityData["Image Source"] = university["Image Source"];
+                            displayUniversityData();
+                        } else {
+                            alert('University not found.');
+                        }
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching CSV file:', error);
+            });
+    }
+
+    // Function to display university data on the web
+    function displayUniversityData() {
+        // Update the DOM elements with the university data
+        document.getElementById("school_name_y").textContent = universityData["school_name_y"];
+        document.getElementById("number-of-ratings").textContent = universityData["Number of Rating"];
+        document.getElementById("overall-quality").textContent = universityData["Overall Quality"];
+        document.getElementById("reputation").textContent = universityData["Reputation"];
+        document.getElementById("facilities").textContent = universityData["Facilities"];
+        document.getElementById("opportunities").textContent = universityData["Opportunities"];
+        document.getElementById("clubs").textContent = universityData["Clubs"];
+        document.getElementById("safety").textContent = universityData["Safety"];
+        document.getElementById("social").textContent = universityData["Social"];
+        document.getElementById("accurate-address").textContent = universityData["accurate_address"];
+        document.getElementById("ca-student-undergraduate").textContent = universityData["CA Student Undergraduate"];
+        document.getElementById("ca-student-graduate").textContent = universityData["CA Student Graduate"];
+        document.getElementById("international-student-undergraduate").textContent = universityData["International Student Undergraduate"];
+        document.getElementById("international-student-graduate").textContent = universityData["International Student Graduate"];
+        document.getElementById("image-source").textContent = universityData["Image Source"];
+
+                // Get the university image element by its ID
+        const universityImage = document.getElementById("image-source");
+        // Set the src attribute with the value from universityData["Image Source"]
+        universityImage.src = universityData["Image Source"];
+    }
+
+    // Add an event listener to the search button
+    document.getElementById("search-button").addEventListener("click", searchUniversity);
+
+    // Autocomplete functionality
+    const autocompleteInput = document.getElementById("autocomplete-search");
+    const autocompleteResults = document.getElementById("autocomplete-results");
+
+    
+    autocompleteInput.addEventListener("input", function () {
+        const query = this.value.toLowerCase();
+        const suggestions = [];
+
+        // Check if the input field is empty
+        if (query.trim() === "") {
+            autocompleteResults.innerHTML = ""; // Clear the suggestions if input is empty
+            return;}
+
+        // Fetch the CSV file (replace 'universities.csv' with the actual path to your CSV file)
+        fetch("OverallRate_Tuition.csv")
+            .then(response => response.text())
+            .then(data => {
+                Papa.parse(data, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: function (parsedData) {
+                        const universities = parsedData.data;
+
+                        // Loop through your university data and find matching universities
+                        for (const university of universities) {
+                            const universityName = university["school_name_y"].toLowerCase();
+                            if (universityName.includes(query) && suggestions.length < 3) {
+                                suggestions.push(universityName.toUpperCase());
+                            }
+                        }
+
+                        // Display the suggestions
+                        autocompleteResults.innerHTML = "";
+                        suggestions.forEach(function (suggestion) {
+
+                            
+                            const suggestionElement = document.createElement("div");
+
+                            suggestionElement.textContent = suggestion.toUpperCase();    
+                            suggestionElement.style.color = "black";
+                            suggestionElement.style.cursor = "pointer";
+                            suggestionElement.style.textAlign = "center";
+                            suggestionElement.style.backgroundColor = "white"; // Set background color to white
+                            suggestionElement.style.padding = "6px"; // Add padding for spacing
+                            
+                            
+
+                            suggestionElement.addEventListener("click", function () {
+                                // When a suggestion is clicked, populate the main search bar and search
+                                document.getElementById("autocomplete-search").value = suggestion;
+                                fetchAndDisplayReviews(suggestion); // This line was added
+                                fetchAndDisplaySchoolSummary(suggestion);
+                                searchUniversityComments();
+                                searchUniversity();
+                                autocompleteResults.innerHTML = "";
+                            });
+
+                            // Add hover effect to change background color to light blue
+                            suggestionElement.addEventListener("mouseover", function () {
+                                suggestionElement.style.backgroundColor = "blue"; // Light blue color
+                                suggestionElement.style.color = "white"; // Light blue color
+                            });
+
+                            // Reset background color when mouse leaves
+                            suggestionElement.addEventListener("mouseout", function () {
+                                suggestionElement.style.backgroundColor = "white"; // Reset to white
+                                suggestionElement.style.color = "black"; // Light blue color
+                            });
+                            autocompleteResults.appendChild(suggestionElement);
+                        });
+                    }
+                });
+            })
+            .catch(error => {
+                console.error('Error fetching CSV file:', error);
+            });
+    });
+
+
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+/////////////////////////////////////////////
+
+
+
+    // Function to search for university comments
+    function searchUniversityComments() {
+        // Get the user input
+        const userInput = document.getElementById("autocomplete-search").value;
+
+    }
+
+    // Add an event listener to the search button
+    document.getElementById("search-button").addEventListener("click", searchUniversityComments);
+
+    // Function to fetch and display reviews
+    function fetchAndDisplayReviews(schoolName) {
+        // Fetch the CSV file containing reviews
+        if (schoolName && schoolName.trim() !== "") {
+            fetch('finalversionx4.csv')
+                .then(response => response.text())
+                .then(data => {
+                    // Parse the CSV data
+                    const rows = Papa.parse(data, { header: true, dynamicTyping: true }).data;
+
+                    // Filter reviews based on schoolName and non-empty comments
+                    const filteredReviews = rows.filter(row => {
+                        const lowerCaseSchoolName = row.school_name ? row.school_name.toLowerCase() : '';
+                        return (
+                            (lowerCaseSchoolName === schoolName.toLowerCase()) &&
+                            (row.comment || row.commentgg)
+                        );
+                    });
+
+                    // Display the reviews in the HTML
+                    const reviewsContainer = document.getElementById('reviews');
+                    reviewsContainer.innerHTML = ''; // Clear previous content
+
+                    // Loop through the filtered reviews and create review cards
+                    filteredReviews.forEach(review => {
+                        const reviewCard = document.createElement('div');
+                        reviewCard.classList.add('review-card');
+                        
+                        let reviewContent = '';
+                        if (review.comment) {
+                            reviewContent = review.comment;
+
+                            reviewCard.innerHTML = `
+                                                        
+                                                        <p><span class="review-date">${review['date']}</span></p>
+                                                        <p class ="font">${reviewContent}</p>
+                                                        <p>Give Score: <span class="review-rating">${review['score']}</span></p>
+                                                        <div style=" bottom: 10px; margin-left: 330px;"> Rate My Prof </div>
+                                                    `;
+
+                        } else if (review.commentgg) {
+                            reviewContent = review.commentgg;
+                            // Construct the HTML for the review card
+                            reviewCard.innerHTML = `
+                                                        
+                                                        <p><span class="review-date">${review["Date"]}</span></p>
+                                                        <p>${reviewContent}</p>
+                                                        <p>Given Score: <span class="review-rating">${review["Rating"]}</span></p>
+                                                        <div style=" bottom: 10px; margin-left: 330px;"> Google Map </div>
+                                                    `;
+                        }
+
+                    
+
+                        // Append the review card to the container
+                        reviewsContainer.appendChild(reviewCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching or displaying reviews:', error);
+                });
+            } else {
+                console.error('School name is empty or undefined.');
+            }
+    };
+
+        // Function to fetch and display school summary
+        function fetchAndDisplaySchoolSummary(Scholname) {
+        // Fetch the CSV file
+        fetch('finalversionx4.csv')
+            .then(response => response.text())
+            .then(data => {
+                // Parse the CSV data
+                const csvData = Papa.parse(data, { header: true }).data;
+                
+                // Group the data by school_name
+                const groupedData = {};
+                for (const row of csvData) {
+
+                    const lowercaseSchoolName = row.school_name.trim().toLowerCase();
+
+                    if (!groupedData[lowercaseSchoolName]) {
+                        groupedData[lowercaseSchoolName] = [];
+                    }
+                    groupedData[lowercaseSchoolName].push(row.school_summary);
+                }
+
+                // Check if the given school_name exists in the grouped data
+                const lowercaseSchoolToDisplay = Scholname.trim().toLowerCase();
+
+                if (groupedData[lowercaseSchoolToDisplay]) {
+                    // Display the school summary in the chatgptoutput div
+                    const chatgptOutput = document.getElementById('chatgptoutput');
+                    chatgptOutput.innerHTML = groupedData[lowercaseSchoolToDisplay][0];
+                } else {
+                    console.log('School not found.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching CSV:', error);
+            });
+    }
+
+
+    const autocompleteInput2 = document.getElementById("autocomplete-search");
+    const infoCard = document.getElementById("info-card");
+    const infoCard2 = document.getElementById("chatgptoutput");
+
+    infoCard.style.display = "none";
+    infoCard2.style.display = "none";
+
+
+    autocompleteInput2.addEventListener("input", function () {
+        const query = this.value.trim(); // Remove leading and trailing whitespace
+
+        if (query === "") {
+            // If the input is empty, hide the info card
+            infoCard.style.display = "none";
+            infoCard2.style.display = "none";
+
+        } else {    
+            // If there is input, show the info card
+            infoCard.style.display = "block";
+            infoCard2.style.display = "block";
+
+        }
+
+    });
+
+
+    </script>
+</body>
+</html>
